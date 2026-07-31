@@ -148,24 +148,32 @@ static uint8_t at_setup_cmd_gpiom(uint8_t para_num)
     int32_t mode = 0;
     int32_t pull = 0;
     esp_at_para_parse_ret_t ret;
+    uint8_t buffer[64] = {0};
     (void)para_num;
 
     if (esp_at_get_para_as_digit(0, &pin) != ESP_AT_PARA_PARSE_RET_OK ||
         esp_at_get_para_as_digit(1, &mode) != ESP_AT_PARA_PARSE_RET_OK) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOM: para parse fail, para_num=%u\r\n", para_num);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     ret = esp_at_get_para_as_digit(2, &pull);
     if (ret != ESP_AT_PARA_PARSE_RET_OK && ret != ESP_AT_PARA_PARSE_RET_OMITTED) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOM: pull parse fail\r\n");
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (mode != 0 && mode != 1) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOM: invalid mode %d\r\n", (int)mode);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (pull < 0 || pull > 2) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOM: invalid pull %d\r\n", (int)pull);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (!at_gpio_is_valid(pin, mode == 1)) {
-        uint8_t buffer[64] = {0};
         int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOM: invalid pin %d\r\n", (int)pin);
         esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
@@ -181,17 +189,21 @@ static uint8_t at_setup_cmd_gpiow(uint8_t para_num)
 {
     int32_t pin = 0;
     int32_t level = 0;
+    uint8_t buffer[64] = {0};
     (void)para_num;
 
     if (esp_at_get_para_as_digit(0, &pin) != ESP_AT_PARA_PARSE_RET_OK ||
         esp_at_get_para_as_digit(1, &level) != ESP_AT_PARA_PARSE_RET_OK) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOW: para parse fail, para_num=%u\r\n", para_num);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (level != 0 && level != 1) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOW: invalid level %d\r\n", (int)level);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (!at_gpio_is_valid(pin, true)) {
-        uint8_t buffer[64] = {0};
         int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOW: invalid pin %d\r\n", (int)pin);
         esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
@@ -212,13 +224,19 @@ static uint8_t at_setup_cmd_gpior(uint8_t para_num)
     (void)para_num;
 
     if (esp_at_get_para_as_digit(0, &pin) != ESP_AT_PARA_PARSE_RET_OK) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOR: para parse fail, para_num=%u\r\n", para_num);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     ret = esp_at_get_para_as_digit(1, &pull);
     if (ret != ESP_AT_PARA_PARSE_RET_OK && ret != ESP_AT_PARA_PARSE_RET_OMITTED) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOR: pull parse fail\r\n");
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (pull < 0 || pull > 2) {
+        int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOR: invalid pull %d\r\n", (int)pull);
+        esp_at_port_write_data(buffer, len);
         return ESP_AT_RESULT_CODE_ERROR;
     }
     if (!at_gpio_is_valid(pin, false)) {
