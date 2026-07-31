@@ -118,7 +118,7 @@ static void at_gpio_set_pull(gpio_num_t pin, int32_t pull)
         gpio_set_pull_mode(pin, GPIO_PULLDOWN_ONLY);
         break;
     default:
-        gpio_set_pull_mode(pin, GPIO_PULLUP_PULLDOWN_DISABLE);
+        gpio_set_pull_mode(pin, GPIO_FLOATING);
         break;
     }
 }
