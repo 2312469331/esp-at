@@ -419,6 +419,10 @@ def setup_env_variables():
     idf_path=os.path.join(os.getcwd(), 'esp-idf')
     os.environ['IDF_PATH']=idf_path
 
+    # set AT_CUSTOM_COMPONENTS
+    at_custom_cmd_path=os.path.join(os.getcwd(), 'examples/at_custom_cmd')
+    os.environ['AT_CUSTOM_COMPONENTS']=at_custom_cmd_path
+
     # get ESP-IDF environment variables
     export_str = ''
     if sys.platform != 'linux2':
