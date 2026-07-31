@@ -125,16 +125,18 @@ static void at_gpio_set_pull(gpio_num_t pin, int32_t pull)
 
 static uint8_t at_test_cmd_gpio(uint8_t *cmd_name)
 {
-    uint8_t buffer[256] = {0};
-    (void)cmd_name;
+    uint8_t buffer[512] = {0};
     int len = snprintf((char *)buffer, sizeof(buffer),
-        "+GPIO usage:\r\n"
+        "GPIO commands:\r\n"
         "  AT+GPIOM=<pin>,<mode>[,<pull>]   mode: 0=input 1=output, pull: 0=none 1=up 2=down\r\n"
         "  AT+GPIOW=<pin>,<level>           write output level (0/1)\r\n"
         "  AT+GPIOR=<pin>[,<pull>]          read input level\r\n"
         "valid in/out pins: 4,13,14,16,17,18,19,21,22,23,25,26,27,32,33\r\n"
         "input-only pins:   34,35,36,39\r\n"
         "reserved:          0,1,2,3,5,6-11,12,15\r\n");
+    if (len >= (int)sizeof(buffer)) {
+        len = sizeof(buffer) - 1;
+    }
     esp_at_port_write_data(buffer, len);
 
     return ESP_AT_RESULT_CODE_OK;
@@ -236,7 +238,6 @@ static uint8_t at_setup_cmd_gpior(uint8_t para_num)
 
 static const esp_at_cmd_t at_custom_cmd[] = {
     {"+TEST", at_test_cmd_test, at_query_cmd_test, at_setup_cmd_test, at_exe_cmd_test},
-    {"+GPIO", at_test_cmd_gpio, NULL, NULL, NULL},
     {"+GPIOM", at_test_cmd_gpio, NULL, at_setup_cmd_gpiom, NULL},
     {"+GPIOW", at_test_cmd_gpio, NULL, at_setup_cmd_gpiow, NULL},
     {"+GPIOR", at_test_cmd_gpio, NULL, at_setup_cmd_gpior, NULL},
