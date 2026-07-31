@@ -207,6 +207,7 @@ static uint8_t at_setup_cmd_gpior(uint8_t para_num)
 {
     int32_t pin = 0;
     int32_t pull = 0;
+    bool has_pull = false;
     uint8_t index = 0;
     esp_at_para_parse_ret_t ret;
     uint8_t buffer[64] = {0};
@@ -220,6 +221,7 @@ static uint8_t at_setup_cmd_gpior(uint8_t para_num)
         if (ret != ESP_AT_PARA_PARSE_RET_OK && ret != ESP_AT_PARA_PARSE_RET_OMITTED) {
             return ESP_AT_RESULT_CODE_ERROR;
         }
+        has_pull = true;
     }
     if (pull < 0 || pull > 2) {
         return ESP_AT_RESULT_CODE_ERROR;
@@ -228,8 +230,11 @@ static uint8_t at_setup_cmd_gpior(uint8_t para_num)
         return ESP_AT_RESULT_CODE_ERROR;
     }
 
-    gpio_set_direction((gpio_num_t)pin, GPIO_MODE_INPUT);
-    at_gpio_set_pull((gpio_num_t)pin, pull);
+    if (has_pull) {
+        /* explicit pull means "read as input" */
+        gpio_set_direction((gpio_num_t)pin, GPIO_MODE_INPUT);
+        at_gpio_set_pull((gpio_num_t)pin, pull);
+    }
 
     int len = snprintf((char *)buffer, sizeof(buffer), "+GPIOR:%d,%d\r\n", (int)pin, gpio_get_level((gpio_num_t)pin));
     esp_at_port_write_data(buffer, len);
