@@ -237,9 +237,9 @@ static uint8_t at_setup_cmd_gpior(uint8_t para_num)
 static const esp_at_cmd_t at_custom_cmd[] = {
     {"+TEST", at_test_cmd_test, at_query_cmd_test, at_setup_cmd_test, at_exe_cmd_test},
     {"+GPIO", at_test_cmd_gpio, NULL, NULL, NULL},
-    {"+GPIOM", NULL, NULL, at_setup_cmd_gpiom, NULL},
-    {"+GPIOW", NULL, NULL, at_setup_cmd_gpiow, NULL},
-    {"+GPIOR", NULL, NULL, at_setup_cmd_gpior, NULL},
+    {"+GPIOM", at_test_cmd_gpio, NULL, at_setup_cmd_gpiom, NULL},
+    {"+GPIOW", at_test_cmd_gpio, NULL, at_setup_cmd_gpiow, NULL},
+    {"+GPIOR", at_test_cmd_gpio, NULL, at_setup_cmd_gpior, NULL},
     /**
      * @brief You can define your own AT commands here.
      */
