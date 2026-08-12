@@ -68,7 +68,7 @@ static uint8_t at_exe_cmd_test(uint8_t *cmd_name)
 }
 
 /**
- * @brief GPIO commands for ESP32-WROOM-32 (NodeMCU-32S)
+ * @brief GPIO commands for ESP32 (WROOM-32) and ESP32-C3
  *
  * - AT+GPIOM=<pin>,<mode>[,<pull>]  configure pin direction
  *       mode: 0=input, 1=output;  pull: 0=none, 1=pull-up, 2=pull-down
@@ -105,6 +105,21 @@ static bool at_gpio_is_valid(int32_t pin, bool for_output)
         return false;
     }
 #endif
+#ifdef CONFIG_IDF_TARGET_ESP32C3
+    /* AT command port on ESP32-C3: TX=GPIO21, RX=GPIO20 */
+    if (pin == 20 || pin == 21) {
+        return false;
+    }
+    /* XTAL_32K_P/N (GPIO0/GPIO1) are used by the external 32 kHz crystal */
+    if (pin == 0 || pin == 1) {
+        return false;
+    }
+    /* Strapping pins (2/8/9) may prevent normal boot if forced.
+     * Remove this block if you really need them. */
+    if (pin == 2 || pin == 8 || pin == 9) {
+        return false;
+    }
+#endif
     return true;
 }
 
@@ -131,9 +146,15 @@ static uint8_t at_test_cmd_gpio(uint8_t *cmd_name)
         "  AT+GPIOM=<pin>,<mode>[,<pull>]   mode: 0=input 1=output, pull: 0=none 1=up 2=down\r\n"
         "  AT+GPIOW=<pin>,<level>           write output level (0/1)\r\n"
         "  AT+GPIOR=<pin>[,<pull>]          read input level\r\n"
+#ifdef CONFIG_IDF_TARGET_ESP32C3
+        "valid in/out pins: 3,4,5,6,7,10,18,19\r\n"
+        "reserved:          0,1,2,8,9,20,21 (AT uart / 32k xtal / strapping)\r\n"
+#else
         "valid in/out pins: 4,13,14,16,17,18,19,21,22,23,25,26,27,32,33\r\n"
         "input-only pins:   34,35,36,39\r\n"
-        "reserved:          0,1,2,3,5,6-11,12,15\r\n");
+        "reserved:          0,1,2,3,5,6-11,12,15\r\n"
+#endif
+        );
     if (len >= (int)sizeof(buffer)) {
         len = sizeof(buffer) - 1;
     }
