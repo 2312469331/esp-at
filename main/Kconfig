@@ -71,7 +71,8 @@ config AT_NET_COMMAND_SUPPORT
 
 config AT_SOCKET_MAX_CONN_NUM
     int "AT socket maximum connection number"
-    default 5
+    default 16
+    range 1 16
     depends on AT_NET_COMMAND_SUPPORT
 
 menu "AT ssl client authentication method"
